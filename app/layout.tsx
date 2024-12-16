@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { AudioPlayer } from "@/components/audio-player";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -63,6 +64,7 @@ export default function RootLayout({
           <Navigation />
           <main className="min-h-screen pt-16">{children}</main>
           <Footer />
+          <AudioPlayer />
           <Toaster />
         </ThemeProvider>
       </body>
