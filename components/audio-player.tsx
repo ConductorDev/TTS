@@ -61,8 +61,6 @@ export function AudioPlayer() {
       audio.addEventListener('error', handleError);
       audio.addEventListener('loadstart', () => console.log('Audio load started'));
       audio.addEventListener('progress', () => console.log('Audio loading progress'));
-      audio.addEventListener('suspend', () => console.log('Audio loading suspended'));
-      audio.addEventListener('abort', () => console.log('Audio loading aborted'));
 
       // Force load the audio
       try {
@@ -78,8 +76,6 @@ export function AudioPlayer() {
         audio.removeEventListener('error', handleError);
         audio.removeEventListener('loadstart', () => console.log('Audio load started'));
         audio.removeEventListener('progress', () => console.log('Audio loading progress'));
-        audio.removeEventListener('suspend', () => console.log('Audio loading suspended'));
-        audio.removeEventListener('abort', () => console.log('Audio loading aborted'));
       };
     }
   }, []);
@@ -164,8 +160,7 @@ export function AudioPlayer() {
           toast.error('Error loading audio file');
         }}
       >
-        <source src="/audio/AUDIO_1054.m4a" type="audio/mp4" />
-        <source src="/audio/AUDIO_1054.m4a" type="audio/x-m4a" />
+        <source src="/audio/AUDIO_1054.mp3" type="audio/mpeg" />
         Your browser does not support the audio element.
       </audio>
       <Button
