@@ -79,9 +79,8 @@ export function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
-      <div className="container flex items-center justify-between h-16">
-        {/* Logo */}
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
+      <nav className="container flex items-center justify-between h-16" aria-label="Main navigation">
         <Link href="/" className="flex items-center gap-2">
           <Image
             src="/media/logos/monochrome/5.png"
@@ -91,13 +90,13 @@ export function Navigation() {
             className="h-10 w-auto dark:invert"
             priority
           />
-          <span className="font-bold text-lg">The Train Station</span>
+          <span className="sr-only">The Train Station - Home</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-6">
           {/* Left Routes */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4" role="navigation" aria-label="Primary navigation">
             {routes.left.map((route) => (
               <div key={route.href} className="relative group">
                 <Link
@@ -106,12 +105,17 @@ export function Navigation() {
                     "text-sm font-medium transition-colors hover:text-primary",
                     pathname === route.href && "text-primary"
                   )}
+                  aria-current={pathname === route.href ? "page" : undefined}
                 >
                   {route.label}
                 </Link>
                 
                 {route.subItems && (
-                  <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <div 
+                    className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all"
+                    role="menu"
+                    aria-label={`${route.label} submenu`}
+                  >
                     <div className="bg-popover rounded-md shadow-md p-4 w-[280px]">
                       {route.subItems.map((item) => (
                         <Link
@@ -121,6 +125,8 @@ export function Navigation() {
                             "block px-4 py-2 text-sm rounded-md transition-colors hover:bg-muted",
                             pathname === item.href && "bg-muted"
                           )}
+                          role="menuitem"
+                          aria-current={pathname === item.href ? "page" : undefined}
                         >
                           <div className="font-medium">{item.label}</div>
                           {item.description && (
@@ -138,7 +144,7 @@ export function Navigation() {
           </div>
 
           {/* Right Routes */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4" role="navigation" aria-label="Secondary navigation">
             {routes.right.map((route) => (
               <Link
                 key={route.href}
@@ -147,6 +153,7 @@ export function Navigation() {
                   "text-sm font-medium transition-colors hover:text-primary",
                   pathname === route.href && "text-primary"
                 )}
+                aria-current={pathname === route.href ? "page" : undefined}
               >
                 {route.label}
               </Link>
@@ -160,13 +167,12 @@ export function Navigation() {
           <TicketButton />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
+              <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Menu className="h-5 w-5" aria-hidden="true" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col gap-4 mt-4">
+              <nav className="flex flex-col gap-4 mt-4" aria-label="Mobile navigation">
                 {[...routes.left, ...routes.right].map((route) => (
                   <div key={route.href} className="space-y-3">
                     <Link
@@ -176,12 +182,13 @@ export function Navigation() {
                         pathname === route.href && "text-primary"
                       )}
                       onClick={() => !route.subItems && setIsOpen(false)}
+                      aria-current={pathname === route.href ? "page" : undefined}
                     >
                       {route.label}
                     </Link>
                     
                     {route.subItems && (
-                      <div className="pl-4 space-y-2">
+                      <div className="pl-4 space-y-2" role="menu" aria-label={`${route.label} submenu`}>
                         {route.subItems.map((item) => (
                           <Link
                             key={item.href}
@@ -191,6 +198,8 @@ export function Navigation() {
                               pathname === item.href && "text-primary"
                             )}
                             onClick={() => setIsOpen(false)}
+                            role="menuitem"
+                            aria-current={pathname === item.href ? "page" : undefined}
                           >
                             {item.label}
                           </Link>
@@ -203,7 +212,7 @@ export function Navigation() {
             </SheetContent>
           </Sheet>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 }
