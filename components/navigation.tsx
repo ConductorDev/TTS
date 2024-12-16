@@ -4,49 +4,30 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { TicketButton } from "@/components/ticket-button";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuLink,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
 import Image from "next/image";
+import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
-interface ListItemProps {
+interface SubItem {
   href: string;
-  title: string;
-  children?: React.ReactNode;
+  label: string;
+  description?: string;
+  external?: boolean;
 }
 
-function ListItem({ href, title, children }: ListItemProps) {
-  const pathname = usePathname();
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          href={href}
-          className={cn(
-            "block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            pathname === href && "bg-accent"
-          )}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          {children && (
-            <p className="mt-1 text-sm leading-tight text-muted-foreground">{children}</p>
-          )}
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  );
+interface Route {
+  href: string;
+  label: string;
+  subItems?: SubItem[];
 }
 
-export function Navigation() {
-  const pathname = usePathname();
-  
-  const leftRoutes = [
+const routes: {
+  left: Route[];
+  right: Route[];
+} = {
+  left: [
     { href: "/", label: "Home" },
     { href: "/events", label: "Events" },
     {
@@ -87,96 +68,142 @@ export function Navigation() {
         },
       ],
     },
-  ];
-
-  const rightRoutes = [
+  ],
+  right: [
     { href: "/contact", label: "Contact" },
-  ];
+  ]
+};
+
+export function Navigation() {
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
       <div className="container flex items-center justify-between h-16">
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/media/logos/monochrome/5.png"
-              alt="The Train Station"
-              width={40}
-              height={40}
-              className="h-10 w-auto dark:invert"
-              priority
-            />
-            <span className="font-bold text-lg">The Train Station</span>
-          </Link>
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/media/logos/monochrome/5.png"
+            alt="The Train Station"
+            width={40}
+            height={40}
+            className="h-10 w-auto dark:invert"
+            priority
+          />
+          <span className="font-bold text-lg">The Train Station</span>
+        </Link>
 
-          <NavigationMenu>
-            <NavigationMenuList>
-              {leftRoutes.map((route) =>
-                route.subItems ? (
-                  <NavigationMenuItem key={route.href}>
-                    <NavigationMenuTrigger
+        {/* Desktop Navigation */}
+        <div className="hidden lg:flex items-center gap-6">
+          {/* Left Routes */}
+          <div className="flex items-center gap-4">
+            {routes.left.map((route) => (
+              <div key={route.href} className="relative group">
+                <Link
+                  href={route.href}
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    pathname === route.href && "text-primary"
+                  )}
+                >
+                  {route.label}
+                </Link>
+                
+                {route.subItems && (
+                  <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                    <div className="bg-popover rounded-md shadow-md p-4 w-[280px]">
+                      {route.subItems.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={cn(
+                            "block px-4 py-2 text-sm rounded-md transition-colors hover:bg-muted",
+                            pathname === item.href && "bg-muted"
+                          )}
+                        >
+                          <div className="font-medium">{item.label}</div>
+                          {item.description && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {item.description}
+                            </div>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Right Routes */}
+          <div className="flex items-center gap-4">
+            {routes.right.map((route) => (
+              <Link
+                key={route.href}
+                href={route.href}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  pathname === route.href && "text-primary"
+                )}
+              >
+                {route.label}
+              </Link>
+            ))}
+            <TicketButton />
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="lg:hidden flex items-center gap-2">
+          <TicketButton />
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <nav className="flex flex-col gap-4 mt-4">
+                {[...routes.left, ...routes.right].map((route) => (
+                  <div key={route.href} className="space-y-3">
+                    <Link
+                      href={route.href}
                       className={cn(
-                        pathname?.startsWith(route.href) && "bg-accent"
+                        "text-lg font-medium transition-colors hover:text-primary block",
+                        pathname === route.href && "text-primary"
                       )}
+                      onClick={() => !route.subItems && setIsOpen(false)}
                     >
                       {route.label}
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid w-[400px] gap-3 p-4">
+                    </Link>
+                    
+                    {route.subItems && (
+                      <div className="pl-4 space-y-2">
                         {route.subItems.map((item) => (
-                          <ListItem
+                          <Link
                             key={item.href}
                             href={item.href}
-                            title={item.label}
+                            className={cn(
+                              "block text-sm text-muted-foreground hover:text-primary",
+                              pathname === item.href && "text-primary"
+                            )}
+                            onClick={() => setIsOpen(false)}
                           >
-                            {item.description}
-                          </ListItem>
+                            {item.label}
+                          </Link>
                         ))}
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                ) : (
-                  <NavigationMenuItem key={route.href}>
-                    <Link href={route.href} legacyBehavior passHref>
-                      <NavigationMenuLink
-                        className={cn(
-                          navigationMenuTriggerStyle(),
-                          pathname === route.href && "bg-accent"
-                        )}
-                      >
-                        {route.label}
-                      </NavigationMenuLink>
-                    </Link>
-                  </NavigationMenuItem>
-                )
-              )}
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <NavigationMenu>
-            <NavigationMenuList>
-              {rightRoutes.map((route) => (
-                <NavigationMenuItem key={route.href}>
-                  <Link href={route.href} legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        pathname === route.href && "bg-accent"
-                      )}
-                    >
-                      {route.label}
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-              ))}
-            </NavigationMenuList>
-          </NavigationMenu>
-
-          <TicketButton />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

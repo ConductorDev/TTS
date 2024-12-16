@@ -4,7 +4,6 @@ import { UpcomingEventsSection } from "@/components/sections/upcoming-events-sec
 import { FeaturedArtistSection } from "@/components/sections/featured-artist";
 import { TestimonialsSection } from "@/components/sections/testimonials-section";
 import { GallerySection } from "@/components/sections/gallery-section";
-import { NewsletterSection } from "@/components/sections/newsletter-signup";
 import { GoogleReviews } from '@/components/sections/google-reviews';
 
 export default function Home() {
@@ -16,7 +15,6 @@ export default function Home() {
       <FeaturedArtistSection />
       <TestimonialsSection />
       <GallerySection />
-      <NewsletterSection />
     </>
   );
 }
