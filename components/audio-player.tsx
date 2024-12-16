@@ -15,25 +15,22 @@ export function AudioPlayer() {
   useEffect(() => {
     const audio = audioRef.current;
     if (audio) {
-      // Log initial audio element state
-      console.log('Audio element initial state:', {
-        src: audio.src,
-        readyState: audio.readyState,
-        networkState: audio.networkState,
-        error: audio.error,
-        currentSrc: audio.currentSrc
-      });
-
       const handleCanPlayThrough = () => {
         console.log('Audio can play through');
         setIsLoaded(true);
       };
 
+      const handleLoadedMetadata = () => {
+        console.log('Audio metadata loaded:', {
+          duration: audio.duration,
+          readyState: audio.readyState
+        });
+      };
+
       const handleLoadedData = () => {
-        console.log('Audio loaded data:', {
+        console.log('Audio data loaded:', {
           duration: audio.duration,
           paused: audio.paused,
-          currentTime: audio.currentTime,
           readyState: audio.readyState,
           networkState: audio.networkState
         });
@@ -47,20 +44,39 @@ export function AudioPlayer() {
           message: audioError?.message,
           event: e,
           src: audio.src,
-          currentSrc: audio.currentSrc,
           networkState: audio.networkState,
           readyState: audio.readyState
         });
-        setError('Error loading audio');
+        setError(`Error loading audio: ${audioError?.message || 'Unknown error'}`);
         toast.error(`Error loading audio: ${audioError?.message || 'Unknown error'}`);
       };
 
+      const handleWaiting = () => {
+        console.log('Audio is waiting for data');
+      };
+
+      const handleStalled = () => {
+        console.log('Audio download has stalled');
+      };
+
+      const handleProgress = (e: Event) => {
+        if (audio.buffered.length > 0) {
+          console.log('Audio loading progress:', {
+            buffered: audio.buffered.end(0),
+            duration: audio.duration,
+            percent: (audio.buffered.end(0) / audio.duration) * 100
+          });
+        }
+      };
+
       // Add event listeners
-      audio.addEventListener('canplaythrough', handleCanPlayThrough);
+      audio.addEventListener('loadedmetadata', handleLoadedMetadata);
       audio.addEventListener('loadeddata', handleLoadedData);
+      audio.addEventListener('canplaythrough', handleCanPlayThrough);
       audio.addEventListener('error', handleError);
-      audio.addEventListener('loadstart', () => console.log('Audio load started'));
-      audio.addEventListener('progress', () => console.log('Audio loading progress'));
+      audio.addEventListener('waiting', handleWaiting);
+      audio.addEventListener('stalled', handleStalled);
+      audio.addEventListener('progress', handleProgress);
 
       // Force load the audio
       try {
@@ -71,11 +87,13 @@ export function AudioPlayer() {
 
       // Cleanup
       return () => {
-        audio.removeEventListener('canplaythrough', handleCanPlayThrough);
+        audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
         audio.removeEventListener('loadeddata', handleLoadedData);
+        audio.removeEventListener('canplaythrough', handleCanPlayThrough);
         audio.removeEventListener('error', handleError);
-        audio.removeEventListener('loadstart', () => console.log('Audio load started'));
-        audio.removeEventListener('progress', () => console.log('Audio loading progress'));
+        audio.removeEventListener('waiting', handleWaiting);
+        audio.removeEventListener('stalled', handleStalled);
+        audio.removeEventListener('progress', handleProgress);
       };
     }
   }, []);
@@ -130,65 +148,57 @@ export function AudioPlayer() {
     }
   };
 
-  // Show loading state
-  if (!isLoaded && !error) {
-    return (
-      <div className="fixed bottom-4 right-4 bg-background/80 backdrop-blur-sm border rounded-lg shadow-lg p-4 flex items-center gap-4">
-        <div className="text-sm text-muted-foreground">Loading audio...</div>
-      </div>
-    );
-  }
-
-  // Hide player if there's an error
-  if (error) {
-    console.log('Audio player hidden due to error:', error);
-    return null;
-  }
-
   return (
     <div className="fixed bottom-4 right-4 bg-background/80 backdrop-blur-sm border rounded-lg shadow-lg p-4 flex items-center gap-4">
+      {!isLoaded && !error && (
+        <div className="text-sm text-muted-foreground">Loading audio...</div>
+      )}
+      {error && (
+        <div className="text-sm text-red-500">{error}</div>
+      )}
       <audio
         ref={audioRef}
         preload="auto"
+        crossOrigin="anonymous"
         onEnded={() => {
           setIsPlaying(false);
           console.log('Audio playback ended');
         }}
-        onError={(e) => {
-          console.error('Audio error event:', e);
-          setError('Error loading audio');
-          toast.error('Error loading audio file');
-        }}
       >
-        <source src="/audio/AUDIO_1054.mp3" type="audio/mpeg" />
+        <source 
+          src="/audio/AUDIO_1054.mp3" 
+          type="audio/mpeg"
+        />
         Your browser does not support the audio element.
       </audio>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={togglePlay}
-        disabled={!isLoaded}
-        aria-label={isPlaying ? "Pause" : "Play"}
-      >
-        {isPlaying ? (
-          <Pause className="h-6 w-6" />
-        ) : (
-          <Play className="h-6 w-6" />
-        )}
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={toggleMute}
-        disabled={!isLoaded}
-        aria-label={isMuted ? "Unmute" : "Mute"}
-      >
-        {isMuted ? (
-          <VolumeX className="h-6 w-6" />
-        ) : (
-          <Volume2 className="h-6 w-6" />
-        )}
-      </Button>
+      {isLoaded && (
+        <>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={togglePlay}
+            aria-label={isPlaying ? "Pause" : "Play"}
+          >
+            {isPlaying ? (
+              <Pause className="h-6 w-6" />
+            ) : (
+              <Play className="h-6 w-6" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleMute}
+            aria-label={isMuted ? "Unmute" : "Mute"}
+          >
+            {isMuted ? (
+              <VolumeX className="h-6 w-6" />
+            ) : (
+              <Volume2 className="h-6 w-6" />
+            )}
+          </Button>
+        </>
+      )}
     </div>
   );
 }
