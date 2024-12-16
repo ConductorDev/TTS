@@ -66,7 +66,7 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Follow Us</h3>
             <div className="flex space-x-4">
               <a 
-                href="https://www.facebook.com/the_train_station_corbin_ky" 
+                href="https://www.facebook.com/thetrainstationcorbin" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary"
@@ -82,6 +82,21 @@ export function Footer() {
               >
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
+              </a>
+              <a 
+                href="https://www.tiktok.com/@thetrainstationcorbin" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary"
+              >
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19.321 5.562a5.124 5.124 0 0 1-.443-.258 6.228 6.228 0 0 1-1.137-.966c-.849-.971-1.166-1.956-1.301-2.833h.004c-.06-.37-.087-.757-.087-1.147v-.003h-3.923v11.767c0 .513-.191 1.053-.533 1.521a2.71 2.71 0 0 1-2.18 1.096 2.717 2.717 0 0 1-2.717-2.715 2.717 2.717 0 0 1 2.717-2.715c.314 0 .614.054.894.153v-3.93a6.61 6.61 0 0 0-.894-.062 6.65 6.65 0 0 0-6.651 6.647 6.65 6.65 0 0 0 6.651 6.647c3.672 0 6.651-2.977 6.651-6.647v-5.725c1.356.987 2.952 1.514 4.653 1.514v-3.929c-.466 0-.918-.059-1.349-.17Z"/>
+                </svg>
+                <span className="sr-only">TikTok</span>
               </a>
               <a 
                 href="https://www.linkedin.com/company/the-train-station-corbin" 
