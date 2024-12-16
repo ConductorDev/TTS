@@ -20,7 +20,8 @@ export function AudioPlayer() {
         src: audio.src,
         readyState: audio.readyState,
         networkState: audio.networkState,
-        error: audio.error
+        error: audio.error,
+        currentSrc: audio.currentSrc
       });
 
       const handleCanPlayThrough = () => {
@@ -29,7 +30,13 @@ export function AudioPlayer() {
       };
 
       const handleLoadedData = () => {
-        console.log('Audio loaded data');
+        console.log('Audio loaded data:', {
+          duration: audio.duration,
+          paused: audio.paused,
+          currentTime: audio.currentTime,
+          readyState: audio.readyState,
+          networkState: audio.networkState
+        });
         setIsLoaded(true);
       };
 
@@ -38,7 +45,11 @@ export function AudioPlayer() {
         console.error('Audio error:', {
           code: audioError?.code,
           message: audioError?.message,
-          event: e
+          event: e,
+          src: audio.src,
+          currentSrc: audio.currentSrc,
+          networkState: audio.networkState,
+          readyState: audio.readyState
         });
         setError('Error loading audio');
         toast.error(`Error loading audio: ${audioError?.message || 'Unknown error'}`);
@@ -48,12 +59,27 @@ export function AudioPlayer() {
       audio.addEventListener('canplaythrough', handleCanPlayThrough);
       audio.addEventListener('loadeddata', handleLoadedData);
       audio.addEventListener('error', handleError);
+      audio.addEventListener('loadstart', () => console.log('Audio load started'));
+      audio.addEventListener('progress', () => console.log('Audio loading progress'));
+      audio.addEventListener('suspend', () => console.log('Audio loading suspended'));
+      audio.addEventListener('abort', () => console.log('Audio loading aborted'));
+
+      // Force load the audio
+      try {
+        audio.load();
+      } catch (error) {
+        console.error('Error forcing audio load:', error);
+      }
 
       // Cleanup
       return () => {
         audio.removeEventListener('canplaythrough', handleCanPlayThrough);
         audio.removeEventListener('loadeddata', handleLoadedData);
         audio.removeEventListener('error', handleError);
+        audio.removeEventListener('loadstart', () => console.log('Audio load started'));
+        audio.removeEventListener('progress', () => console.log('Audio loading progress'));
+        audio.removeEventListener('suspend', () => console.log('Audio loading suspended'));
+        audio.removeEventListener('abort', () => console.log('Audio loading aborted'));
       };
     }
   }, []);
@@ -119,6 +145,7 @@ export function AudioPlayer() {
 
   // Hide player if there's an error
   if (error) {
+    console.log('Audio player hidden due to error:', error);
     return null;
   }
 
@@ -126,7 +153,6 @@ export function AudioPlayer() {
     <div className="fixed bottom-4 right-4 bg-background/80 backdrop-blur-sm border rounded-lg shadow-lg p-4 flex items-center gap-4">
       <audio
         ref={audioRef}
-        src="/audio/AUDIO_1054.m4a"
         preload="auto"
         onEnded={() => {
           setIsPlaying(false);
@@ -137,7 +163,11 @@ export function AudioPlayer() {
           setError('Error loading audio');
           toast.error('Error loading audio file');
         }}
-      />
+      >
+        <source src="/audio/AUDIO_1054.m4a" type="audio/mp4" />
+        <source src="/audio/AUDIO_1054.m4a" type="audio/x-m4a" />
+        Your browser does not support the audio element.
+      </audio>
       <Button
         variant="ghost"
         size="icon"
