@@ -9,7 +9,7 @@ export function Footer() {
           <div className="space-y-3">
             <h3 className="text-lg font-semibold">The Train Station</h3>
             <p className="text-sm text-muted-foreground">
-              100 N Main St<br />
+              4672 5th Street Road<br />
               Corbin, KY 40701
             </p>
           </div>
@@ -35,6 +35,21 @@ export function Footer() {
               <li>
                 <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">
                   Contact
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookie-policy" className="text-sm text-muted-foreground hover:text-primary">
+                  Cookie Policy
                 </Link>
               </li>
             </ul>

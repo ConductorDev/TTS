@@ -6,8 +6,13 @@ import { Footer } from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AudioPlayer } from "@/components/audio-player";
+import dynamic from 'next/dynamic';
 
 const inter = Inter({ subsets: ["latin"] });
+
+const CookieConsent = dynamic(() => import('@/components/CookieConsent'), {
+  ssr: false
+});
 
 export const metadata: Metadata = {
   title: "The Train Station",
@@ -66,6 +71,7 @@ export default function RootLayout({
           <Footer />
           <AudioPlayer />
           <Toaster />
+          <CookieConsent />
         </ThemeProvider>
       </body>
     </html>
